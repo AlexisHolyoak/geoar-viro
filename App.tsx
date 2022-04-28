@@ -5,50 +5,50 @@ import {
   ViroText,
   ViroTrackingStateConstants,
   ViroARSceneNavigator,
+  ViroBox,
+  ViroMaterials,
+  ViroAnimations,
 } from '@viro-community/react-viro';
 
-const HelloWorldSceneAR = () => {
-  const [text, setText] = useState('Initializing AR...');
-
-  function onInitialized(state: any, reason: any) {
-    console.log('guncelleme', state, reason);
-    if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-      setText('Hello World!');
-    } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
-      // Handle loss of tracking
-    }
-  }
+const InitialScene = () => {
+  ViroMaterials.createMaterials({
+    wood: {
+      diffuseTexture: require('./assets/woodtexture.jpeg'),
+    },
+  });
+  ViroAnimations.registerAnimations({
+    rotate: {
+      duration: 2500,
+      properties: {
+        rotateY: '+=90',
+      },
+    },
+  });
   return (
-    <ViroARScene onTrackingUpdated={onInitialized}>
-      <ViroText
-        text={text}
-        scale={[0.5, 0.5, 0.5]}
-        position={[0, 0, -1]}
-        style={styles.helloWorldTextStyle}
+    <ViroARScene>
+      <ViroBox
+        height={2}
+        length={2}
+        width={2}
+        position={[0, -1, -1]}
+        scale={[0.2, 0.2, 0.2]}
+        materials={['wood']}
+        animation={{ name: 'rotate', loop: true, run: true }}
       />
     </ViroARScene>
   );
 };
-
-var styles = StyleSheet.create({
-  f1: { flex: 1 },
-  helloWorldTextStyle: {
-    fontFamily: 'Arial',
-    fontSize: 30,
-    color: '#ffffff',
-    textAlignVertical: 'center',
-    textAlign: 'center',
-  },
-});
 
 export default () => {
   return (
     <ViroARSceneNavigator
       autofocus={true}
       initialScene={{
-        scene: HelloWorldSceneAR,
+        scene: InitialScene,
       }}
-      style={styles.f1}
+      style={{ flex: 1 }}
     />
   );
 };
+
+var styles = StyleSheet.create({});
