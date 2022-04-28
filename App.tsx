@@ -12,10 +12,11 @@ import {
   ViroAmbientLight,
 } from '@viro-community/react-viro';
 
-const InitialScene = () => {
+const InitialScene = (props) => {
+  let data = props.sceneNavigator.viroAppProps;
   ViroMaterials.createMaterials({
-    wood: {
-      diffuseTexture: require('./assets/woodtexture.jpeg'),
+    tv: {
+      diffuseTexture: require('./assets/tv/Old_Tv/TV_Body_material_Base_Color.png'),
     },
   });
   ViroAnimations.registerAnimations({
@@ -29,19 +30,30 @@ const InitialScene = () => {
   return (
     <ViroARScene>
       <ViroAmbientLight color="#ffffff" />
-      <Viro3DObject
-        source={require('./assets/skull/12140_Skull_v3_L2.obj')}
-        position={[0, 0, -5]}
-        scale={[0.05, 0.05, 0.05]}
-        rotation={[-45, 50, 40]}
-        type="OBJ"
-      ></Viro3DObject>
+      {data.object === 'skull' ? (
+        <Viro3DObject
+          source={require('./assets/skull/12140_Skull_v3_L2.obj')}
+          position={[0, 0, -5]}
+          scale={[0.05, 0.05, 0.05]}
+          rotation={[-45, 50, 40]}
+          type="OBJ"
+        />
+      ) : (
+        <Viro3DObject
+          source={require('./assets/tv/Old_Tv/Old_Tv.obj')}
+          position={[0, 0, -5]}
+          scale={[0.005, 0.005, 0.005]}
+          materials={['tv']}
+          rotation={[-45, 50, 40]}
+          type="OBJ"
+        />
+      )}
     </ViroARScene>
   );
 };
 
 export default () => {
-  const [object, setObject] = useState('skull');
+  const [object, setObject] = useState('tv');
   return (
     <View style={styles.mainView}>
       <ViroARSceneNavigator
