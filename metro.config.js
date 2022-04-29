@@ -34,6 +34,7 @@ module.exports = (async () => {
         'bin',
         'arobject',
         'gif',
+        'lib',
       ],
     },
   };
