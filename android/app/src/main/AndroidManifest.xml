@@ -4,13 +4,14 @@
     <queries>
         <package android:name="com.google.ar.core" />
     </queries>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- You may need these if doing any screen recording from within the app -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <!-- Other camera related features -->
-    <uses-feature android:name="android.hardware.camera.ar" />
+    <uses-feature android:name="android.hardware.camera.ar"  android:required="true"/>
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" tools:replace="required"/>
     <!-- Specifying OpenGL verison or requirements -->
@@ -23,9 +24,12 @@
       android:name=".MainApplication"
       android:label="@string/app_name"
       android:icon="@mipmap/ic_launcher"
+      android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+      android:launchMode="singleTask"
       android:roundIcon="@mipmap/ic_launcher_round"
       android:allowBackup="false"
       android:usesCleartextTraffic="true"
+      android:windowSoftInputMode="adjustResize"
       android:theme="@style/AppTheme">
       <meta-data android:name="com.google.ar.core" android:value="required" />
       <activity
