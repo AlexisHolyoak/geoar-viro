@@ -96,7 +96,6 @@ export default class ARScene extends React.Component<any, any> {
       console.log('Calling getCurrentLocation: Geolocation.watchPosition');
 
       this.listener = Geolocation.watchPosition(geoSuccess, (error) => {}, { distanceFilter: 10 });
-      console.log('ERROR line 77');
     }
   };
   getNearbyPlaces = async () => {
