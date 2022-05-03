@@ -10,12 +10,13 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@react-native-community/geolocation": "^2.0.2",
     "@viro-community/react-viro": "^2.23.0",
     "react": "17.0.2",
     "react-native": "0.65.1",
     "react-native-compass-heading": "^1.4.0",
-    "react-native-permissions": "^3.3.1",
-    "@react-native-community/geolocation": "^2.0.2"
+    "react-native-geolocation-service": "3.1.0",
+    "react-native-permissions": "^3.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

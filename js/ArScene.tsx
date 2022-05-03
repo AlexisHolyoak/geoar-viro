@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, ToastAndroid, Platform } from 'react-native';
+import { StyleSheet, ToastAndroid, Platform, DeviceEventEmitter } from 'react-native';
 import {
   ViroARScene,
   ViroQuad,
@@ -12,7 +12,7 @@ import {
   ViroAmbientLight,
   ViroAnimations,
 } from '@viro-community/react-viro';
-import Geolocation from '@react-native-community/geolocation';
+import Geolocation from 'react-native-geolocation-service';
 import { requestMultiple, PERMISSIONS, RESULTS, Permission } from 'react-native-permissions';
 const Toast = (message: any) => {
   ToastAndroid.showWithGravityAndOffset(message, ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50);
@@ -45,14 +45,75 @@ export default class ARScene extends React.Component<any, any> {
       (statuses) => {
         console.log('Camera', statuses[PERMISSIONS.ANDROID.CAMERA]);
         console.log('Location', statuses[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION]);
-        this.setState({
-          locationReady: statuses[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED,
-          cameraReady: statuses[PERMISSIONS.ANDROID.CAMERA] === RESULTS.GRANTED,
-        });
+        this.setState(
+          {
+            locationReady: statuses[PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION] === RESULTS.GRANTED,
+            cameraReady: statuses[PERMISSIONS.ANDROID.CAMERA] === RESULTS.GRANTED,
+          },
+          this.getCurrentLocation
+        );
       }
     );
   }
+  componentWillUnmount() {
+    if (this.listener) {
+      console.log('Listener on unmount: ' + this.listener);
+      Geolocation.clearWatch(this.listener);
+    }
+  }
+  getCurrentLocation = () => {
+    console.log('Calling getCurrentLocation');
+    if (this.state.cameraReady && this.state.locationReady) {
+      const geoSuccess = (result: any) => {
+        this.setState(
+          {
+            location: result.coords,
+          },
+          this.getNearbyPlaces
+        );
+      };
+      console.log('Calling getCurrentLocation: Geolocation.watchPosition');
+
+      this.listener = Geolocation.watchPosition(geoSuccess, (error) => {}, { distanceFilter: 10 });
+      console.log('ERROR line 77');
+    }
+  };
+  getNearbyPlaces = async () => {
+    console.log('Calling getNearbyPlaces');
+    const URL = PlacesAPIURL(this.state.location.latitude, this.state.location.longitude);
+    console.log('Calling getNearbyPlaces: URL -> ' + URL);
+    fetch(URL)
+      .then((response) => response.json())
+      .then((responseJson) => {
+        if (responseJson.status === 'OK') {
+          console.log('Calling getNearbyPlaces: OK response -> ' + responseJson);
+          const places = responseJson.results.map((rawPlace: any) => {
+            console.log('Calling getNearbyPlaces: rawPlace - > ' + rawPlace);
+            return {
+              id: rawPlace.place_id,
+              title: rawPlace.name,
+              lat: rawPlace.geometry.location.lat,
+              lng: rawPlace.geometry.location.lng,
+              icon: rawPlace.icon,
+            };
+          });
+          console.log('Calling getNearbyPlaces: places -> ' + places);
+          this.setState({ nearbyPlaces: places });
+        } else {
+          console.warn(responseJson.status);
+        }
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
   placeArObjects = () => {
+    if (this.state.nearbyPlaces.length == 0) {
+      return undefined;
+    }
+    const ARTags = this.state.nearbyPlaces.map((item: any) => {
+      console.log(item);
+    });
     return (
       <ViroText
         text={this.state.text}
