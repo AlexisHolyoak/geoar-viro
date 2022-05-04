@@ -86,6 +86,7 @@ export default class ARScene extends React.Component<any, any> {
     console.log('Calling getCurrentLocation');
     if (this.state.cameraReady && this.state.locationReady) {
       const geoSuccess = (result: any) => {
+        console.log(result.coords)
         this.setState(
           {
             location: result.coords,
@@ -162,14 +163,18 @@ export default class ARScene extends React.Component<any, any> {
     if (this.state.nearbyPlaces.length == 0) {
       return undefined;
     }
-    const ARTags = this.state.nearbyPlaces.map((item: any) => {
+    const points = [{lat: this.state.location.latitude, lng:this.state.location.longitude, id:"1", title:"custom point"}];
+    const ARTags = points.map((item: any) => {
       const coords = this.transformGpsToAR(item.lat, item.lng);
-      const scale = Math.abs(Math.round(coords.z / 15));
+      let scale = Math.abs(Math.round(coords.z / 15));
+      scale = scale >= 1 ? scale : 1;
       const distance = distanceBetweenPoints(this.state.location, {
         latitude: item.lat,
         longitude: item.lng,
       });
       console.log('Calling placeArObjects: distance -> ' + distance);
+      console.log('Calling placeArObjects: scale -> ' + scale);
+
       return (
         <ViroNode
           key={item.id}
@@ -186,7 +191,6 @@ export default class ARScene extends React.Component<any, any> {
               style={styles.helloWorldTextStyle}
               position={[0, -0.75, 0]}
             />
-            <ViroImage width={1} height={1} source={{ uri: item.icon }} position={[0, -1.5, 0]} />
           </ViroFlexView>
         </ViroNode>
       );
