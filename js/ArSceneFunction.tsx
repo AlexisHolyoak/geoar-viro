@@ -21,6 +21,7 @@ export default function ARScene(props) {
   const [locationReady, setLocationReady] = useState<boolean>(false);
   const [cameraReady, setCameraReady] = useState<boolean>(false);
   const [location, setLocation] = useState<any>(null);
+  const [initLocation, setInitLocation] = useState<any>(null);
   const [compassHeading, setCompassHeading] = useState<number>(0);
   const [pointClicked, setPointClicked] = useState<string>('');
   const [listener, setListener] = useState<any>();
@@ -37,6 +38,9 @@ export default function ARScene(props) {
         Geolocation.watchPosition(
           (position) => {
             setLocation(position.coords);
+            if(!location){
+              setInitLocation(position.coords);
+            }
             console.log(position.coords);
           },
           (error) => {
@@ -127,12 +131,12 @@ export default function ARScene(props) {
   };
   const placeArObjects = () => {
     //locationReady is already a prerequisite to run this function
-    if (!location) {
+    if (!initLocation) {
       throw 'location is not ready';
     }
     const points = [
-      { lat: location.latitude + 0.00001, lng: location.longitude, id: '1', title: 'point 1' },
-      { lat: location.latitude, lng: location.longitude + 0.00001, id: '2', title: 'point 2' },
+      { lat: initLocation.latitude + 0.00001, lng: initLocation.longitude, id: '1', title: 'point 1' },
+      { lat: initLocation.latitude, lng: initLocation.longitude + 0.00001, id: '2', title: 'point 2' },
     ];
     const ARTags = points.map((item: any) => {
       const coords = transformGpsToAR(item.lat, item.lng);
@@ -151,14 +155,15 @@ export default function ARScene(props) {
           scale={[scale, scale, scale]}
           rotation={[0, 0, 0]}
           position={[coords.x, 0, coords.z]}
+          transformBehaviors={["billboard"]}
         >
           <ViroFlexView style={{ alignItems: 'center', justifyContent: 'center' }}>
             <ViroAmbientLight color="#ffffff" />
             <ViroText
               text={item.title}
               style={styles.helloWorldTextStyle}
-              width={2}
-              height={2}
+              width={10}
+              height={10}
               onClick={() => props.arSceneNavigator.viroAppProps.setGlobalState(item.id)}
             />
           </ViroFlexView>
@@ -170,7 +175,7 @@ export default function ARScene(props) {
 
   return (
     <ViroARScene onTrackingUpdated={onInitialized}>
-      {locationReady && cameraReady && location && placeArObjects()}
+      {locationReady && cameraReady &&  initLocation && placeArObjects()}
     </ViroARScene>
   );
 }
