@@ -26,37 +26,21 @@ export default function ARScene(props) {
   const [pointClicked, setPointClicked] = useState<string>('');
   const [listener, setListener] = useState<any>();
   ViroMaterials.createMaterials({
-    skull: {
-      diffuseTexture: require('../assets/skull/Skull.jpg'),
+    pineapple: {
+      diffuseTexture: require('../assets/pineapple/10200_Pineapple.jpg'),
     },
   });
   //todo: use the altitude to place at right height.
   //check if the location is ready, camera is ready, and then begin a location watch
   useEffect(() => {
     if (locationReady && cameraReady) {
-      setListener(
-        Geolocation.watchPosition(
-          (position) => {
-            setLocation(position.coords);
-            if(!location){
-              setInitLocation(position.coords);
-            }
-            console.log(position.coords);
-          },
-          (error) => {
-            // Error
-          },
-          {
-            enableHighAccuracy: true,
-            distanceFilter: 10,
-          }
-        )
-      );
+      Geolocation.getCurrentPosition((position) => {
+        setLocation(position.coords);
+        if (!location) {
+          setInitLocation(position.coords);
+        }
+      });
     }
-    //return function to stop the watch
-    return () => {
-      Geolocation.clearWatch(listener);
-    };
   }, [cameraReady, locationReady]);
 
   useEffect(() => {
@@ -135,8 +119,30 @@ export default function ARScene(props) {
       throw 'location is not ready';
     }
     const points = [
-      { lat: initLocation.latitude + 0.00001, lng: initLocation.longitude, id: '1', title: 'point 1' },
-      { lat: initLocation.latitude, lng: initLocation.longitude + 0.00001, id: '2', title: 'point 2' },
+      {
+        lat: initLocation.latitude + 0.000001,
+        lng: initLocation.longitude,
+        id: '1',
+        title: 'point 1',
+      },
+      {
+        lat: initLocation.latitude + 0.000012,
+        lng: initLocation.longitude,
+        id: '2',
+        title: 'point 2',
+      },
+      {
+        lat: initLocation.latitude + 0.000014,
+        lng: initLocation.longitude,
+        id: '3',
+        title: 'point 3',
+      },
+      {
+        lat: initLocation.latitude + 0.000016,
+        lng: initLocation.longitude,
+        id: '4',
+        title: 'point 4',
+      },
     ];
     const ARTags = points.map((item: any) => {
       const coords = transformGpsToAR(item.lat, item.lng);
@@ -155,17 +161,17 @@ export default function ARScene(props) {
           scale={[scale, scale, scale]}
           rotation={[0, 0, 0]}
           position={[coords.x, 0, coords.z]}
-          transformBehaviors={["billboard"]}
         >
           <ViroFlexView style={{ alignItems: 'center', justifyContent: 'center' }}>
             <ViroAmbientLight color="#ffffff" />
-            <ViroText
-              text={item.title}
-              style={styles.helloWorldTextStyle}
-              width={10}
-              height={10}
-              onClick={() => props.arSceneNavigator.viroAppProps.setGlobalState(item.id)}
-            />
+            <Viro3DObject
+              key={'pinapple'}
+              source={require('../assets/pineapple/10200_Pineapple_v1-L2.obj')}
+              materials={'pineapple'}
+              rotation={[-180, 0, 0]}
+              type="OBJ"
+              scale={[0.05, 0.05, 0.05]}
+            ></Viro3DObject>
           </ViroFlexView>
         </ViroNode>
       );
@@ -175,7 +181,7 @@ export default function ARScene(props) {
 
   return (
     <ViroARScene onTrackingUpdated={onInitialized}>
-      {locationReady && cameraReady &&  initLocation && placeArObjects()}
+      {locationReady && cameraReady && initLocation && placeArObjects()}
     </ViroARScene>
   );
 }
