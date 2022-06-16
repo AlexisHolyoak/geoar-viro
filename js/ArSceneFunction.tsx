@@ -120,7 +120,7 @@ export default function ARScene(props) {
     }
     const points = [
       {
-        lat: initLocation.latitude + 0.000001,
+        lat: initLocation.latitude + 0.00001,
         lng: initLocation.longitude,
         id: '1',
         title: 'point 1',
